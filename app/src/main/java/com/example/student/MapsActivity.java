@@ -1,5 +1,7 @@
 package com.example.student;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
@@ -17,49 +19,207 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+import java.util.Objects;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    LocationManager locationManager;
-    String provider;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+   DatabaseReference mRootRef = database.getReference();
+   //DatabaseReference mChildref;
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        //Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        provider = locationManager.getBestProvider(new Criteria(), false);
-        Location location;
-        location = locationManager.getLastKnownLocation(provider);
-        if (location != null) {
-            Log.i("Location info", "found ");
 
-        } else {
-            Log.i("Location info:", "Location not found ");
+       final String[] drivers_array = new String[10];
+        for(int i = 0; i < 3; ++i)
+        {
+            String drivers = "Driver_"+(i+1);
+            drivers_array[i] = drivers;
         }
-//        onLocationChanged( location);
-
+       final String[] route_arr = new String[10];
+        for(int i = 0; i <= 3; ++i)
+        {
+            String current_route = "Route_"+(i+1);
+            route_arr[i] = current_route;
         }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+        final DatabaseReference mChildRef1 = mRootRef.child(route_arr[0]).child(drivers_array[0]);
+        final DatabaseReference mChildRef2 = mRootRef.child(route_arr[1]);
+        final DatabaseReference mChildRef3 = mRootRef.child(route_arr[2]);
+        Log.i("Ayushi", route_arr[0]);
+        mChildRef1.addChildEventListener(new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                Log.i("Shreeay", "onCreate: abcd1234");
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                Log.i("Shreeay", "onCreate: abcd");
+                LocationClass obj = dataSnapshot.getValue(LocationClass.class);
+                Log.i("Output",dataSnapshot.getKey());
+                Log.i("output", obj.getLatitude().toString());
+                String obj1 = dataSnapshot.getValue(String.class);
+                Log.i("Output", obj1);
+             //   DatabaseReference mDriverChild1 = mChildRef1.child(drivers_array[0]);
+               // DatabaseReference mDriverChild2 = mChildRef1.child(drivers_array[1]);
+                //DatabaseReference mDriverChild3 = mChildRef1.child(drivers_array[2]);
+            /*mDriverChild1.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    LocationClass obj = dataSnapshot.getValue(LocationClass.class);
+                    Log.i("Output",dataSnapshot.getKey());
+                    Log.i("output", obj.getLatitude().toString());
+                   String obj1 = dataSnapshot.getValue(String.class);
+                   Log.i("Output", obj1);
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });*/
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+       /* mChildRef2.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                DatabaseReference mDriverChild1 = mChildRef1.child(drivers_array[0]);
+                mDriverChild1.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        LocationClass obj = dataSnapshot.getValue(LocationClass.class);
+                        Log.d("Output",dataSnapshot.getKey());
+                        Log.d("output", (obj).getLatitude().toString());
+                        String obj1 = dataSnapshot.getValue(String.class);
+                        Log.d("Output", obj1);
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                DatabaseReference mDriverChild2 = mChildRef1.child(drivers_array[1]);
+                DatabaseReference mDriverChild3 = mChildRef1.child(drivers_array[2]);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mChildRef3.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                DatabaseReference mDriverChild1 = mChildRef1.child(drivers_array[0]);
+                DatabaseReference mDriverChild2 = mChildRef1.child(drivers_array[1]);
+                DatabaseReference mDriverChild3 = mChildRef1.child(drivers_array[2]);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });*/
+
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         // Add a marker in Sydney and move the camera
         LatLng vellore = new LatLng(0, 0);
         mMap.addMarker(new MarkerOptions().position(vellore).title("Marker"));
@@ -67,41 +227,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
     }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Double lat;
-        Double lng;
-        lat = location.getLatitude();
-        lng = location.getLongitude();
-        mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)).title("Your place!"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng( lat,lng),12));
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
     @SuppressLint("MissingPermission")
     @Override
     protected void onResume() {
         super.onResume();
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
     }
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(this);
+    }
+
+    public void onBusLocationChanged(Double lat, Double lng){
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)).title("Your place!"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng( lat,lng),12));
     }
 }
