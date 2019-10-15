@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -32,8 +33,10 @@ import java.util.Objects;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    MapView mMapView;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
    DatabaseReference mRootRef = database.getReference();
+
    //DatabaseReference mChildref;
     @SuppressLint("MissingPermission")
     @Override
@@ -44,8 +47,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+       // mMapView.getMapAsync(this);
+       /* mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                googleMap = mMap;
 
-       final String[] drivers_array = new String[10];
+                // For showing a move to my location button
+                googleMap.setMyLocationEnabled(true);
+
+                // For dropping a marker at a point on the Map
+                LatLng sydney = new LatLng(-34, 151);
+                googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
+
+                // For zooming automatically to the location of the marker
+
+            }
+        });*/
+        mapFragment.getMapAsync(this);
+        //onMapReady(mMap);
+        final String[] drivers_array = new String[10];
         for(int i = 0; i <=3; ++i)
         {
             String drivers = "Driver_"+(i+1);
@@ -57,10 +78,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String current_route = "Route_"+(i+1);
             route_arr[i] = current_route;
         }
+       // mapFragment.getMapAsync(this);
+       // final Marker route11 = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).visible(false));
         //mapFragment.getMapAsync(this);
-        final Marker route11 = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).visible(false));
-        //mapFragment.getMapAsync(this);
-        final Marker route12 = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).visible(false));
+        //final Marker route12 = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).visible(false));
+
         final LocationClass obj11 = new LocationClass();
         final LocationClass obj12 = new LocationClass();
         final LocationClass obj13 = new LocationClass();
@@ -81,7 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final DatabaseReference mChildRef31 = mRootRef.child(route_arr[2]).child(drivers_array[0]);
         final DatabaseReference mChildRef32 = mRootRef.child(route_arr[2]).child(drivers_array[1]);
         final DatabaseReference mChildRef33 = mRootRef.child(route_arr[2]).child(drivers_array[2]);
-        //mapFragment.getMapAsync(this);
+       // mapFragment.getMapAsync(this);
         mChildRef11.addChildEventListener(new ChildEventListener() {
 
             @Override
@@ -111,9 +133,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 if(obj11.isLatitude_flag() && obj11.isLongitude_flag()) {
 
-                   // route11 = mMap.addMarker(new MarkerOptions().position(new LatLng(obj11.getLatitude(), obj11.getLongitude())).title("Bus 1"));
-                    //route11.remove();
-                    route11.setVisible(true);
+                    mMap.clear();;
+                    Marker route11 = mMap.addMarker(new MarkerOptions().position(new LatLng(obj11.getLatitude(), obj11.getLongitude())).title("Bus 1"));
+                   //route11.remove();
+                    //route11.setVisible(true);
                     route11.setPosition(new LatLng(obj11.getLatitude(), obj11.getLongitude()));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(obj11.getLatitude(), obj11.getLongitude())));
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
@@ -168,9 +191,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     obj12.setLongitude(lon);
                 }
                 if(obj12.isLatitude_flag() && obj12.isLongitude_flag()) {
-                    //mMap.clear();
-                    //mMap.addMarker(new MarkerOptions().position(new LatLng(obj12.getLatitude(), obj12.getLongitude())).title("Bus 1"));
-                    route12.setVisible(true);
+                   mMap.clear();
+                    Marker route12 = mMap.addMarker(new MarkerOptions().position(new LatLng(obj12.getLatitude(), obj12.getLongitude())).title("Bus 1"));
+                    //route12.setVisible(true);
                     route12.setPosition(new LatLng(obj12.getLatitude(), obj12.getLongitude()));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(obj12.getLatitude(), obj12.getLongitude())));
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
